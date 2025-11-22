@@ -1,18 +1,25 @@
 import pandas as pd
 from app.data.db import connect_database
 
-def insert_incident(date, incident_type, severity, status, description, reported_by=None):
-    conn = connect_database()
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO cyber_incidents 
-        (date, incident_type, severity, status, description, reported_by)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (date, incident_type, severity, status, description, reported_by))
-    conn.commit()
-    incident_id = cursor.lastrowid
-    conn.close()
-    return incident_id
+def insert_incident(date_reported, incident_type, severity, status, description, reported_by):
+    """Insert a new cyber incident"""
+    try:
+        conn = connect_database()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO cyber_incidents 
+            (date_reported, incident_type, severity, status, description, reported_by)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (date_reported, incident_type, severity, status, description, reported_by))
+        
+        incident_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        return incident_id
+    except Exception as e:
+        print(f"Error inserting incident: {e}")
+        return None
 
 def get_all_incidents():
     conn = connect_database()
